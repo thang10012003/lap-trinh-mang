@@ -4,15 +4,15 @@
  */
 package TCP_RailFence;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.io.*;
-import javax.swing.JFrame;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileSystemView;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -51,7 +51,9 @@ public class Server_Receive extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jText_MSG = new javax.swing.JTextArea();
 
+        XacNhan.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         XacNhan.setTitle("Xác Nhận");
+        XacNhan.setAlwaysOnTop(true);
         XacNhan.setBounds(new java.awt.Rectangle(0, 0, 400, 400));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -86,7 +88,7 @@ public class Server_Receive extends javax.swing.JFrame {
                     .addGroup(XacNhanLayout.createSequentialGroup()
                         .addGap(55, 55, 55)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addContainerGap(61, Short.MAX_VALUE))
         );
         XacNhanLayout.setVerticalGroup(
             XacNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -97,7 +99,7 @@ public class Server_Receive extends javax.swing.JFrame {
                 .addGroup(XacNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Yes_Button, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(No_Button, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(206, Short.MAX_VALUE))
+                .addContainerGap(131, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -151,7 +153,19 @@ public class Server_Receive extends javax.swing.JFrame {
 
     private void Yes_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Yes_ButtonActionPerformed
         // TODO add your handling code here:
-        File filetoDownload = new File(filename);
+        String path = "";
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Select a directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = chooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedDir = chooser.getSelectedFile();
+            path = selectedDir.getAbsolutePath();
+            System.out.println("Selected directory: " + path);
+
+        }
+        
+        File filetoDownload = new File(path+"\\"+filename);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filetoDownload);
@@ -159,6 +173,10 @@ public class Server_Receive extends javax.swing.JFrame {
             fileOutputStream.close();
 
             XacNhan.dispose();
+            LocalTime currentTime = LocalTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String formattedTime = currentTime.format(formatter);
+            jText_MSG.setText(jText_MSG.getText() + "\n"+"Download thành công file:\t"+filename + "\t" + formattedTime);
         } catch (IOException e) {
             // TODO: handle exception
             e.printStackTrace();
@@ -225,14 +243,20 @@ public class Server_Receive extends javax.swing.JFrame {
                         data = fileContentByte;
 
                     }
-                    jText_MSG.setText("Client vừa gửi cho bạn 1 file:\t"+fileName1);
+                    // Lấy thời gian hiện tại
+                    LocalTime currentTime = LocalTime.now();
+
+                    // Định dạng đối tượng LocalTime thành chuỗi ở định dạng "hh:mm:ss"
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    String formattedTime = currentTime.format(formatter);
+                    jText_MSG.setText(jText_MSG.getText() + "\n"+"Client vừa gửi cho bạn 1 file:\t"+fileName1 + "\t" + formattedTime);
 
                     XacNhan.setVisible(true);
+
                 }
                 
             }
         }catch(IOException e){
-            e.printStackTrace();
         }
 
     }
@@ -262,3 +286,30 @@ public class Server_Receive extends javax.swing.JFrame {
 //     e.printStackTrace();
 // }
 
+//            public void actionPerformed(ActionEvent e) {
+//                int result = JOptionPane.showConfirmDialog(frame,
+//                        "Bạn có chắc muốn lưu sinh viên này",
+//                        "Xác nhận",
+//                        JOptionPane.YES_NO_OPTION,
+//                        JOptionPane.QUESTION_MESSAGE);
+//                switch (result) {
+//                    case JOptionPane.YES_OPTION:
+//                        label.setText("Bạn chọn: Yes");
+//                        break;
+//                    case JOptionPane.NO_OPTION:
+//                        label.setText("Bạn chọn : No");
+//                        break;
+//                    default:
+//                        label.setText("Chưa ");
+//                        break;
+//                }
+//            }
+
+
+
+//        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+//        jfc.setDialogTitle("Tuy chinh button");
+//        int returnValue = jfc.showDialog(null, "Luu nek!");
+//        if (returnValue == JFileChooser.APPROVE_OPTION) {
+//            System.out.println(jfc.getSelectedFile().getPath());
+//        }

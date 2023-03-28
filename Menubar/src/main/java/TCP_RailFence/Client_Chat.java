@@ -4,6 +4,7 @@
  */
 package TCP_RailFence;
 
+import static TCP_RailFence.Server_Chat.Encode_Rail_Fence;
 import java.io.*;
 import java.net.*;
 
@@ -127,12 +128,92 @@ public class Client_Chat extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_msg_sendActionPerformed
 
+    //Encode message
+    public static String Encode_Rail_Fence(String s, int key){
+        int row = key;
+        int col = s.length();
+        char[][] arr = new char[row][col];
+        String output="";
+        int j = 0;
+        boolean check = false;
+        for(int i = 0; i < col; i++){
+            if(j == 0 || j== key - 1){
+                check = !check;
+            }
+            arr[j][i] = s.charAt(i);
+            if(check){
+                j++;
+            }else{
+                j--;
+            }
+        }
+        for(int i = 0; i < row; i++){
+            for(int k = 0; k < col; k++){
+                if(arr[i][k] != 0){
+                    output += arr[i][k];
+                }
+            }
+        }
+        return output;
+    }
+    
+    //Decode Message
+    public static String Decode_Rail_Fence(String s, int key){
+        int row = key;
+        int col = s.length();
+        char[][] arr = new char[row][col];
+        String output="";
+        int j = 0;
+        boolean check = false;
+        for(int i = 0; i < col; i++){
+            if(j == 0 || j== key - 1){
+                check = !check;
+            }
+            arr[j][i] = '*';
+            if(check){
+                j++;
+            }else{
+                j--;
+            }
+        }
+        for(int i = 0; i < row; i++){
+            for(int k = 0; k < col; k++){
+                if(arr[i][k]!='*'){
+                    arr[i][k] = '-';
+                }
+            }
+        }
+        int index = 0;
+        for(int i = 0; i < row; i++){
+            for(int k = 0; k < col; k++){
+                if(arr[i][k]=='*'){
+                    arr[i][k] = s.charAt(index++);
+                }
+            }
+        }
+        j = 0;
+        check = false;
+        for(int i = 0; i < col; i++){
+            if(j == 0 || j== key - 1){
+                check = !check;
+            }
+            output += arr[j][i];
+            if(check){
+                j++;
+            }else{
+                j--;
+            }
+        }
+        
+        return output;
+    }
     private void msg_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msg_buttonActionPerformed
         // TODO add your handling code here:
         try {
             String msg ="";
             msg = msg_send.getText().trim();
-            data_output.writeUTF(msg);
+            String msg_encode = Encode_Rail_Fence(msg, 3);
+            data_output.writeUTF(msg_encode);
             jText_msg.setText(jText_msg.getText().trim() + "\n" + "You:  "+ msg);
             
         } catch (Exception e) {
@@ -146,7 +227,8 @@ public class Client_Chat extends javax.swing.JFrame {
         try {
             String msg ="";
             msg = "Client has disconnected!";
-            data_output.writeUTF(msg);
+            String msg_encode = Encode_Rail_Fence(msg,3);
+            data_output.writeUTF(msg_encode);
             jText_msg.setText(jText_msg.getText().trim() + "\n" +"Disconnected Successfully!");
             socket.close();
             
@@ -195,11 +277,13 @@ public class Client_Chat extends javax.swing.JFrame {
             data_output =  new DataOutputStream(socket.getOutputStream());
             while(true){
                 msg = data_input.readUTF();
+                String msg_decode = Decode_Rail_Fence(msg,3);
                 if(!msg.equals("")){
                     if(msg.equals("Server Disconnected.....")){
-                        jText_msg.setText(jText_msg.getText().trim() + "\n"+msg);
+                        jText_msg.setText(jText_msg.getText().trim() + "\n"+msg_decode);
                     }else{
-                        jText_msg.setText(jText_msg.getText().trim() + "\n" + "Server:  "+msg);     
+//                        jText_msg.setText(jText_msg.getText().trim() + "\n" + "Server:  "+msg_decode);     
+                        jText_msg.setText(jText_msg.getText().trim() + "\n" + "Server:  "+msg_decode);     
                     }
                 }
             }
